@@ -1,0 +1,223 @@
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          type: string
+          enum: [user, admin]
+        isEmailVerified:
+          type: boolean
+      example:
+        id: 5ebac534954b54139806c112
+        email: fake@example.com
+        name: fake name
+        role: user
+        isEmailVerified: false
+
+    Token:
+      type: object
+      properties:
+        token:
+          type: string
+        expires:
+          type: string
+          format: date-time
+      example:
+        token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWJhYzUzNDk1NGI1NDEzOTgwNmMxMTIiLCJpYXQiOjE1ODkyOTg0ODQsImV4cCI6MTU4OTMwMDI4NH0.m1U63blB0MLej_WfB7yC2FTMnCziif9X8yzwDEfJXAg
+        expires: 2020-05-12T16:18:04.793Z
+
+    AuthTokens:
+      type: object
+      properties:
+        access:
+          $ref: '#/components/schemas/Token'
+        refresh:
+          $ref: '#/components/schemas/Token'
+
+    TrackRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        title:
+          type: string
+        url:
+          type: string
+        time:
+          type: string
+          format: date-time
+      example:
+        -
+          name: Google Chrome
+          title: Test
+          url: https://test.example.com
+          time: 2023-03-20T11:05:32.576Z
+        -
+          name: Google Chrome 1
+          title: Test 1
+          url: https://test1.example.com
+          time: 2023-03-20T11:05:34.576Z
+
+    Track:
+      type: object
+      properties:
+        name:
+          type: string
+        totalSecond:
+          type: integer
+        memories:
+          type: integer
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+        positionFirst:
+          type: integer
+        tracks:
+          type: array
+        positionLast:
+          type: integer
+        overlapNth:
+          type: integer
+      example:
+        name: Google Chrome
+        totalSecond: 123
+        memories: 2
+        start: 2023-04-18T02:20:05.700Z
+        end: 2023-04-18T02:22:17.697Z
+        positionFirst: 140
+        tracks: [
+          {
+            user: 6436913d5420cf02fc5b6db5,
+            name: Google Chrome,
+            title: Test,
+            url: https://test.example.com,
+            start: 2023-04-18T02:20:05.700Z,
+            end: 2023-04-18T02:21:06.699Z,
+            id: 643e1451db37e106dfaa5cba
+          },
+          {
+            user: 6436913d5420cf02fc5b6db5,
+            name: Google Chrome,
+            title: Test 1,
+            url: https://test1.example.com,
+            start: 2023-04-18T02:21:09.699Z,
+            end: 2023-04-18T02:22:17.697Z,
+            id: 643e1451db37e106dfaa5cbb
+          }
+        ]
+        positionLast: 142
+        overlapNth: 0
+
+    TrackList:
+      type: object
+      properties:
+        0 :
+          $ref: '#/components/schemas/Track'
+        1 :
+          $ref: '#/components/schemas/Track'
+        2 :
+          $ref: '#/components/schemas/Track'
+
+    TrackByDate:
+      type: object
+      properties:
+        _id:
+          type: string
+        count:
+          type: integer
+      example:
+        -
+          _id: 2023-04-19
+          count: 1
+        -
+          _id: 2023-04-20
+          count: 1
+
+    TrackUserResponse:
+      type: Object
+      properties:
+        name:
+          type: string
+        title:
+          type: string
+        url:
+          type: string
+        dateTime:
+          type: string
+          format: date-time
+      example:
+        -
+          _id: 6417b4324dcc881db4aebe3b
+          trackId: 6440f7c25004ce00cffee5ac
+          name: Google Chrome
+          title: Test
+          url: https://test.example.com
+          dateTime: 2023-03-20T11:05:32.576Z
+          userDetail:
+            -
+              _id: 6417b4324dcc881db4aebe3b
+              name: Fake Name
+              email: fake@example.com
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: number
+        message:
+          type: string
+
+  responses:
+    DuplicateEmail:
+      description: Email already taken
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: 400
+            message: Email already taken
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: 401
+            message: Please authenticate
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: 403
+            message: Forbidden
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: 404
+            message: Not found
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
